@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout2"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Controlling">
+
+    <Button
+        android:id="@+id/offf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="144dp"
+        android:layout_marginTop="60dp"
+        android:text="Adelante"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnAuto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Modo Automatico"
+        app:layout_constraintTop_toBottomOf="@+id/bntLimpiar"
+        tools:layout_editor_absoluteX="12dp" />
+
+    <Button
+        android:id="@+id/btnRuta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Guardar ruta"
+        app:layout_constraintTop_toBottomOf="@+id/btnAuto"
+        tools:layout_editor_absoluteX="12dp" />
+
+    <Button
+        android:id="@+id/bntLimpiar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Modo Limpiar"
+        app:layout_constraintTop_toBottomOf="@+id/btnDwn"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="187dp"
+        android:layout_height="209dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="36dp"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_constraintStart_toEndOf="@+id/btnAuto"
+        app:layout_constraintTop_toBottomOf="@+id/btnDwn" />
+
+    <Button
+        android:id="@+id/btnLft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="92dp"
+        android:text="izquierdo"
+        app:layout_constraintEnd_toStartOf="@+id/onn"
+        app:layout_constraintTop_toBottomOf="@+id/offf" />
+
+    <Button
+        android:id="@+id/btnDwn"
+        android:layout_width="94dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="144dp"
+        android:text="Atras"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/onn" />
+
+    <Button
+        android:id="@+id/onn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="236dp"
+        android:layout_marginTop="108dp"
+        android:text="Derecho"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

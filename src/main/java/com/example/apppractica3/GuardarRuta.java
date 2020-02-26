@@ -10,54 +10,43 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.UUID;
 
-public class Controlling extends Activity {
-    private static final String TAG = "Controlling";
+public class GuardarRuta extends Activity {
+    //Variables utilizadas para conexcion con el modulo Bluetooth
+    private static final String TAG = "GuardarRuta";
     private int mMaxChars = 50000;//Default//change this to string..........
     private UUID mDeviceUUID;
     private BluetoothSocket mBTSocket;
     private ReadInput mReadThread = null;
-
     private boolean mIsUserInitiatedDisconnect = false;
     private boolean mIsBluetoothConnected = false;
-
-
     private BluetoothDevice mDevice;
 
-    final static char on='9';//on
-    final static char off='7';//off
-    char izquierda = '6';//Izquierda
-    char atras = '5';//Atras
-    char automatico = '4';//Automatico
-    char limpiar = '3';//Limpiar
-    char rutas = '2';//Pantalla de limpiar rutas
-    char verRutas = '1'; //Ver rutas
-
-
-    private ProgressDialog progressDialog;
-    Button btnOn,btnOff, btnIzquierda, btnAbajo, btnRuta, btnAutomatico, btnLimpieza, btnVerRutas;
-
+    //Variables de la clase guardar, funcionamieto
+    Button btnGuardar;
+    Spinner cbxDireccion, cbxTiempo;
+    ListView movRuta;
+    //PlainText nombreRuta;
+    String movimientoo = "";
+    String tiempoo = "";
+    ArrayList<Ruta> guardarRuta = new ArrayList<Ruta>();
+    ArrayList<MovimientosRuta> movimientos = new ArrayList<MovimientosRuta>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_controlling);
-
+        setContentView(R.layout.activity_guardar_ruta);
         ActivityHelper.initialize(this);
-        // mBtnDisconnect = (Button) findViewById(R.id.btnDisconnect);
-        btnOn=(Button)findViewById(R.id.onn);//Derecha
-        btnOff=(Button)findViewById(R.id.offf); //Adelante
-        btnIzquierda = (Button)findViewById(R.id.btnLft);
-        btnAbajo = (Button)findViewById(R.id.btnDwn);
-        btnRuta = (Button)findViewById(R.id.btnRuta);
-        btnAutomatico = (Button)findViewById(R.id.btnAuto);
-        btnLimpieza = (Button)findViewById(R.id.bntLimpiar);
-        btnVerRutas = (Buttton)findViewById(R.id.btnRecorrer);
 
 
         Intent intent = getIntent();
@@ -69,143 +58,90 @@ public class Controlling extends Activity {
         Log.d(TAG, "Ready");
 
 
+        cbxDireccion = (Spinner)findViewById(R.id.idDireccion);
+        cbxTiempo = (Spinner)findViewById(R.id.idSegundos);
 
-//Boton derecha para mover carro en modo manual
+        btnGuardar = (Button)findViewById(R.id.btnSave);
 
-        btnOn.setOnClickListener(new View.OnClickListener()
+        movRuta = (ListView)findViewById(R.id.listView);
+
+        ArrayList<String> direcciones = new ArrayList<>();
+        ArrayList<String> tiempo = new ArrayList<>();
+
+        direcciones.add("Adelante");
+        direcciones.add("Izquierda");
+        direcciones.add("Derecha");
+        direcciones.add("Atras");
+
+        tiempo.add("1");
+        tiempo.add("2");
+        tiempo.add("3");
+        tiempo.add("4");
+        tiempo.add("5");
+        tiempo.add("6");
+        tiempo.add("7");
+        tiempo.add("8");
+        tiempo.add("9");
+
+        ArrayAdapter adprM = new ArrayAdapter(GuardarRuta.this, android.R.layout.simple_spinner_dropdown_item, direcciones);
+        ArrayAdapter adprT = new ArrayAdapter(GuardarRuta.this, android.R.layout.simple_dropdown_item_1line, tiempo);
+
+        cbxDireccion.setAdapter(adprM);
+        cbxTiempo.setAdapter(adprT);
+
+
+
+
+
+        cbxDireccion.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String elemento = (String) cbxDireccion.getAdapter().getItem(position);
+                switch(elemento){
+                    case "Izquierda":
+                        movimientoo = "6";
+                        break;
+                    case "Derecha":
+                        movimientoo = "9";
+                        break;
+                    case "Adelante":
+                        movimientoo = "7";
+                        break;
+                    case "Atras":
+                        movimientoo = "5";
+                        break;
+                }
+
+            }
+        });
+
+
+        cbxTiempo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String elemento = (String) cbxDireccion.getAdapter().getItem(position);
+                tiempoo = elemento;
+
+            }
+        });
+
+        movimientos.add(new MovimientosRuta(movimientoo, tiempoo));
+
+
+        btnGuardar.setOnClickListener(new View.OnClickListener()
         {
 
             @Override
             public void onClick(View v) {
 // TODO Auto-generated method stub
+                String nombre = "";
+                guardarRuta.add(new Ruta(nombre, movimientos));
+                movimientos = new ArrayList<>();
 
-
-                try {
-                    mBTSocket.getOutputStream().write(on);
-
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    msg("Error");
-                }
             }});
-
-
-
-//Boton adelante para mover carro manual
-
-        btnOff.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v) {
-// TODO Auto-generated method stub
-                try {
-                    String envio = "9";
-                    mBTSocket.getOutputStream().write(off);
-                    msg(""+off);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    msg("Error");
-                }
-            }});
-
-
-
-//Boton izquierda para carro manual
-        btnIzquierda.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v) {
-// TODO Auto-generated method stub
-                try {
-                    mBTSocket.getOutputStream().write(izquierda);
-
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    msg("Error");
-                }
-            }});
-
-//Boton abajo para carro manual
-        btnAbajo.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v) {
-// TODO Auto-generated method stub
-                try {
-                    mBTSocket.getOutputStream().write(atras);
-
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    msg("Error");
-                }
-            }});
-
-
-
-        //Ingreso a otro layout
-        //Boton para setear ruta en EEPROM
-        btnRuta.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v) {
-// TODO Auto-generated method stub
-                try {
-                    mBTSocket.getOutputStream().write(rutas);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    msg("Error");
-                }
-            }});
-
-        //Boton para pasar de carro manual a carro automatico
-        btnAutomatico.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v) {
-// TODO Auto-generated method stub
-                try {
-                    mBTSocket.getOutputStream().write(automatico);
-
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    msg("Error");
-                }
-            }});
-
-
-
-
-
-        //Boton para pasar de carro manual a carro automatico
-        btnLimpieza.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v) {
-// TODO Auto-generated method stub
-                try {
-                    mBTSocket.getOutputStream().write(limpiar);
-
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    msg("Error");
-                }
-            }});
-
 
     }
+
 
     private class ReadInput implements Runnable {
 
@@ -227,7 +163,7 @@ public class Controlling extends Activity {
 
             try {
                 inputStream = mBTSocket.getInputStream();
-               // msg("Mire esta cosa "+inputStream);
+                // msg("Mire esta cosa "+inputStream);
                 while (!bStop) {
                     byte[] buffer = new byte[256];
                     if (inputStream.available() > 0) {
@@ -311,7 +247,7 @@ public class Controlling extends Activity {
     @Override
     protected void onPause() {
         if (mBTSocket != null && mIsBluetoothConnected) {
-            new DisConnectBT().execute();
+            new GuardarRuta.DisConnectBT().execute();
         }
         Log.d(TAG, "Paused");
         super.onPause();
@@ -320,7 +256,7 @@ public class Controlling extends Activity {
     @Override
     protected void onResume() {
         if (mBTSocket == null || !mIsBluetoothConnected) {
-            new ConnectBT().execute();
+            new GuardarRuta.ConnectBT().execute();
         }
         Log.d(TAG, "Resumed");
         super.onResume();
@@ -344,7 +280,7 @@ public class Controlling extends Activity {
         @Override
         protected void onPreExecute() {
 
-            progressDialog = ProgressDialog.show(Controlling.this, "Hold on", "Connecting");// http://stackoverflow.com/a/11130220/1287554
+            //progressDialog = ProgressDialog.show(Controlling.this, "Hold on", "Connecting");// http://stackoverflow.com/a/11130220/1287554
 
         }
 
@@ -378,10 +314,10 @@ public class Controlling extends Activity {
             } else {
                 msg("Connected to device");
                 mIsBluetoothConnected = true;
-                mReadThread = new ReadInput(); // Kick off input reader
+                mReadThread = new GuardarRuta.ReadInput(); // Kick off input reader
             }
 
-            progressDialog.dismiss();
+            //progressDialog.dismiss();
         }
 
     }
@@ -390,4 +326,7 @@ public class Controlling extends Activity {
         // TODO Auto-generated method stub
         super.onDestroy();
     }
+
+
+
 }

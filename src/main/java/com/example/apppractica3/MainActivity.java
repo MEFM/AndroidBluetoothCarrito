@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -31,18 +30,20 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.preference.PreferenceManager;
 
+import java.io.IOException;
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
 
 
-    Button idManual, idAutomatico, idConectar, idBuscar;
-    private ListView listView;
+    Button idManual, idGenRuta, idRuta, idConectar, idBuscar;
+    public static ListView listView;
     private BluetoothAdapter mBTAdapter = null;
     private static final int BT_ENABLE_REQUEST = 10; // This is the code we use for BT Enable
     private static final int SETTINGS = 20;
-    private UUID mDeviceUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private int mBufferSize = 50000; //Default
+    public static BluetoothDevice enviaParaAct = null;
+    public static UUID mDeviceUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    public static int mBufferSize = 50000; //Default
     public static final String DEVICE_EXTRA = "com.example.apppractica3.SOCKET";
     public static final String DEVICE_UUID = "com.example.apppractica3.uuid";
     private static final String DEVICE_LIST = "com.example.apppractica3.devicelist";
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         idBuscar = (Button)findViewById(R.id.IdBuscar);
         idConectar = (Button)findViewById(R.id.IdConectar);
+        idGenRuta = (Button)findViewById(R.id.idGuardarRuta);
 
         listView = (ListView) findViewById(R.id.listview);
 
@@ -90,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (!mBTAdapter.isEnabled()) {
                     Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBT, BT_ENABLE_REQUEST);
+
                 } else {
                     new SearchDevices().execute();
                 }
@@ -100,12 +103,36 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View arg0) {
-                BluetoothDevice device = ((MyAdapter) (listView.getAdapter())).getSelectedItem();
-                Intent intent = new Intent(getApplicationContext(), Controlling.class);
-                intent.putExtra(DEVICE_EXTRA, device);
-                intent.putExtra(DEVICE_UUID, mDeviceUUID.toString());
-                intent.putExtra(BUFFER_SIZE, mBufferSize);
-                startActivity(intent);
+
+                try{
+                    BluetoothDevice device = ((MyAdapter) (listView.getAdapter())).getSelectedItem();
+                    Intent intent = new Intent(getApplicationContext(), Controlling.class);
+                    intent.putExtra(DEVICE_EXTRA, device);
+                    intent.putExtra(DEVICE_UUID, mDeviceUUID.toString());
+                    intent.putExtra(BUFFER_SIZE, mBufferSize);
+                    startActivity(intent);
+                }catch(Exception e){
+                    msg("Debes buscar un dispositivio BT primero");
+                }
+
+            }
+        });
+
+        idGenRuta.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                try{
+                    BluetoothDevice device = ((MyAdapter) (listView.getAdapter())).getSelectedItem();
+                    Intent intent = new Intent(getApplicationContext(), GuardarRuta.class);
+                    intent.putExtra(DEVICE_EXTRA, device);
+                    intent.putExtra(DEVICE_UUID, mDeviceUUID.toString());
+                    intent.putExtra(BUFFER_SIZE, mBufferSize);
+                    startActivity(intent);
+                }catch(Exception e){
+                    msg("Debes buscar un dispositivio BT primero");
+                }
+
             }
         });
 
@@ -218,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
      * @author ryder
      *
      */
-    private class MyAdapter extends ArrayAdapter<BluetoothDevice> {
+    public class MyAdapter extends ArrayAdapter<BluetoothDevice> {
         private int selectedIndex;
         private Context context;
         private int selectedColor = Color.parseColor("#abcdef");

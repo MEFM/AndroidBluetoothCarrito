@@ -27,11 +27,11 @@
         tools:layout_editor_absoluteX="12dp" />
 
     <Button
-        android:id="@+id/btnRuta"
+        android:id="@+id/clrEEPROM"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
-        android:text="Guardar ruta"
+        android:text="Limpiar Rutas"
         app:layout_constraintTop_toBottomOf="@+id/btnAuto"
         tools:layout_editor_absoluteX="12dp" />
 
@@ -46,10 +46,11 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="179dp"
-        android:layout_height="297dp"
+        android:layout_width="178dp"
+        android:layout_height="177dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="36dp"
+        android:background="#46A3A0A0"
         android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintStart_toEndOf="@+id/btnAuto"
         app:layout_constraintTop_toBottomOf="@+id/btnDwn" />
@@ -83,13 +84,22 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnRecorrer"
+        android:id="@+id/idActivar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="28dp"
-        android:text="Recorrer Ruta"
+        android:layout_marginTop="24dp"
+        android:text="Activar manual"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnRuta" />
+        app:layout_constraintTop_toBottomOf="@+id/clrEEPROM" />
+
+    <Button
+        android:id="@+id/btnRecorrido"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
+        android:layout_marginTop="56dp"
+        android:text="Recorrer"
+        app:layout_constraintStart_toEndOf="@+id/idActivar"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

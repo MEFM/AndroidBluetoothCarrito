@@ -25,6 +25,7 @@
         android:layout_marginStart="124dp"
         android:layout_marginTop="24dp"
         android:ems="10"
+        android:maxLength="5"
         android:inputType="textPersonName"
         android:text="Nombre Mov."
         app:layout_constraintStart_toStartOf="parent"
@@ -47,25 +48,17 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="40dp"
         app:layout_constraintEnd_toStartOf="@+id/idSegundos"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.763"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <Spinner
         android:id="@+id/idSegundos"
-        android:layout_width="66dp"
-        android:layout_height="28dp"
+        android:layout_width="77dp"
+        android:layout_height="30dp"
         android:layout_marginTop="32dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
-        tools:layout_editor_absoluteX="239dp" />
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="Seg"
-        app:layout_constraintStart_toEndOf="@+id/idSegundos"
+        android:layout_marginEnd="88dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <TextView
@@ -80,8 +73,8 @@
 
     <ListView
         android:id="@+id/listView"
-        android:layout_width="253dp"
-        android:layout_height="216dp"
+        android:layout_width="267dp"
+        android:layout_height="94dp"
         android:layout_marginStart="72dp"
         android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -91,9 +84,19 @@
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="84dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="80dp"
         android:text="Guardar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listView" />
+
+    <Button
+        android:id="@+id/bntGuardarMov"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="60dp"
+        android:text="Movimiento"
+        app:layout_constraintEnd_toStartOf="@+id/btnSave"
         app:layout_constraintTop_toBottomOf="@+id/listView" />
 </androidx.constraintlayout.widget.ConstraintLayout>

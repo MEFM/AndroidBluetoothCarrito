@@ -7,18 +7,18 @@ import android.preference.PreferenceManager;
 import java.util.*;
 
 public class MovimientosRuta {
-    String movimiento;
-    String tiempo;
+    char movimiento;
+    char tiempo;
 
-    public MovimientosRuta(String movimiento, String tiempo){
+    public MovimientosRuta(char movimiento, char tiempo){
         this.movimiento = movimiento;
         this.tiempo = tiempo;
     }
 
-    String getMovimiento(){
+    char getMovimiento(){
         return this.movimiento;
     }
-    String getTiempo(){
+    char getTiempo(){
         return this.tiempo;
     }
 }

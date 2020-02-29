@@ -20,27 +20,47 @@ public class Controlling extends Activity {
     private static final String TAG = "Controlling";
     private int mMaxChars = 50000;//Default//change this to string..........
     private UUID mDeviceUUID;
-    private BluetoothSocket mBTSocket;
+    public static BluetoothSocket mBTSocket;
     private ReadInput mReadThread = null;
+    public static BluetoothDevice dev;
 
     private boolean mIsUserInitiatedDisconnect = false;
     private boolean mIsBluetoothConnected = false;
 
 
+    private BluetoothAdapter mBTAdapter = null;
+    private static final int BT_ENABLE_REQUEST = 10; // This is the code we use for BT Enable
+    private static final int SETTINGS = 20;
+    public static BluetoothDevice enviaParaAct = null;
+    public static int mBufferSize = 50000; //Default
+    public static final String DEVICE_EXTRA = "com.example.apppractica3.SOCKET";
+    public static final String DEVICE_UUID = "com.example.apppractica3.uuid";
+    private static final String DEVICE_LIST = "com.example.apppractica3.devicelist";
+    private static final String DEVICE_LIST_SELECTED = "com.example.apppractica3.devicelistselected";
+    public static final String BUFFER_SIZE = "com.example.apppractica3.buffersize";
+
+
+
+
     private BluetoothDevice mDevice;
 
-    final static char on='9';//on
-    final static char off='7';//off
-    char izquierda = '6';//Izquierda
-    char atras = '5';//Atras
-    char automatico = '4';//Automatico
-    char limpiar = '3';//Limpiar
-    char rutas = '2';//Pantalla de limpiar rutas
-    char verRutas = '1'; //Ver rutas
-
+    final static char on='D';//Derecha
+    final static char off='T';//Adelante
+    char izquierda = 'I';//Izquierda
+    char atras = 'A';//Atras
+    char automatico = '$';//Automatico
+    char limpiar = '*';//Limpiar
+    char cleanEEPROM = '%';//Limpiar la EEPROM
+    char activarModManual = '@'; //Dar inicio al modo manual
+    char activarRecorrido = '?';
+    boolean activacion = false;
 
     private ProgressDialog progressDialog;
-    Button btnOn,btnOff, btnIzquierda, btnAbajo, btnRuta, btnAutomatico, btnLimpieza, btnVerRutas;
+    Button btnOn,btnOff, btnIzquierda, btnAbajo, btnLimpiarEEPROM, btnAutomatico, btnLimpieza, activarManual;
+    Button recorrer;
+
+
+
 
 
     @Override
@@ -51,14 +71,22 @@ public class Controlling extends Activity {
         ActivityHelper.initialize(this);
         // mBtnDisconnect = (Button) findViewById(R.id.btnDisconnect);
         btnOn=(Button)findViewById(R.id.onn);//Derecha
+        btnOn.setEnabled(activacion);
+
         btnOff=(Button)findViewById(R.id.offf); //Adelante
+        btnOff.setEnabled(activacion);
+
         btnIzquierda = (Button)findViewById(R.id.btnLft);
+        btnIzquierda.setEnabled(activacion);
+
         btnAbajo = (Button)findViewById(R.id.btnDwn);
-        btnRuta = (Button)findViewById(R.id.btnRuta);
+        btnAbajo.setEnabled(activacion);
+
+        btnLimpiarEEPROM = (Button)findViewById(R.id.clrEEPROM);
         btnAutomatico = (Button)findViewById(R.id.btnAuto);
         btnLimpieza = (Button)findViewById(R.id.bntLimpiar);
-        btnVerRutas = (Buttton)findViewById(R.id.btnRecorrer);
-
+        activarManual = (Button)findViewById(R.id.idActivar);
+        recorrer = (Button)findViewById(R.id.btnRecorrido);
 
         Intent intent = getIntent();
         Bundle b = intent.getExtras();
@@ -147,25 +175,6 @@ public class Controlling extends Activity {
                 }
             }});
 
-
-
-        //Ingreso a otro layout
-        //Boton para setear ruta en EEPROM
-        btnRuta.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v) {
-// TODO Auto-generated method stub
-                try {
-                    mBTSocket.getOutputStream().write(rutas);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    msg("Error");
-                }
-            }});
-
         //Boton para pasar de carro manual a carro automatico
         btnAutomatico.setOnClickListener(new View.OnClickListener()
         {
@@ -175,6 +184,11 @@ public class Controlling extends Activity {
 // TODO Auto-generated method stub
                 try {
                     mBTSocket.getOutputStream().write(automatico);
+                    activacion = false;
+                    btnOff.setEnabled(activacion);
+                    btnOn.setEnabled(activacion);
+                    btnIzquierda.setEnabled(activacion);
+                    btnAbajo.setEnabled(activacion);
 
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
@@ -182,10 +196,6 @@ public class Controlling extends Activity {
                     msg("Error");
                 }
             }});
-
-
-
-
 
         //Boton para pasar de carro manual a carro automatico
         btnLimpieza.setOnClickListener(new View.OnClickListener()
@@ -204,6 +214,62 @@ public class Controlling extends Activity {
                 }
             }});
 
+        //Habilitar el modo manual
+        activarManual.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View v) {
+// TODO Auto-generated method stub
+                try {
+                    mBTSocket.getOutputStream().write(activarModManual);
+                    activacion = true;
+                    btnOff.setEnabled(activacion);
+                    btnOn.setEnabled(activacion);
+                    btnIzquierda.setEnabled(activacion);
+                    btnAbajo.setEnabled(activacion);
+
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    msg("Error");
+                }
+            }});
+
+
+        //Limpiar la EEPROM perro
+        btnLimpiarEEPROM.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View v) {
+// TODO Auto-generated method stub
+                try {
+                    mBTSocket.getOutputStream().write(cleanEEPROM);
+
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    msg("Error");
+                }
+            }});
+
+        recorrer.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View v) {
+// TODO Auto-generated method stub
+                try {
+                    mBTSocket.getOutputStream().write(activarRecorrido);
+
+
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    msg("Error");
+                }
+            }});
 
     }
 
@@ -390,4 +456,7 @@ public class Controlling extends Activity {
         // TODO Auto-generated method stub
         super.onDestroy();
     }
+
+
+
 }

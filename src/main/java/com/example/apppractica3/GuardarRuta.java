@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -26,21 +27,33 @@ public class GuardarRuta extends Activity {
     private static final String TAG = "GuardarRuta";
     private int mMaxChars = 50000;//Default//change this to string..........
     private UUID mDeviceUUID;
-    private BluetoothSocket mBTSocket;
+    public static BluetoothSocket mBTSocket;
     private ReadInput mReadThread = null;
-    private boolean mIsUserInitiatedDisconnect = false;
-    private boolean mIsBluetoothConnected = false;
+    public static BluetoothDevice dev;
+
     private BluetoothDevice mDevice;
 
+
+    private boolean mIsUserInitiatedDisconnect = false;
+    private boolean mIsBluetoothConnected = false;
+
+    private ProgressDialog progressDialog;
+
     //Variables de la clase guardar, funcionamieto
-    Button btnGuardar;
+    Button btnGuardar, bntMovimiento;
     Spinner cbxDireccion, cbxTiempo;
     ListView movRuta;
-    //PlainText nombreRuta;
-    String movimientoo = "";
-    String tiempoo = "";
+    //Cadena enviado por bytes
+    String cadena = "#;";
+    String movimientoo;
+    String tiempoo;
     ArrayList<Ruta> guardarRuta = new ArrayList<Ruta>();
     ArrayList<MovimientosRuta> movimientos = new ArrayList<MovimientosRuta>();
+    EditText idNombre;
+
+    //Variable para control de cantidad de movimientos
+    int contadorMovimientos = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,39 +62,46 @@ public class GuardarRuta extends Activity {
         ActivityHelper.initialize(this);
 
 
+
         Intent intent = getIntent();
         Bundle b = intent.getExtras();
-        mDevice = b.getParcelable(MainActivity.DEVICE_EXTRA);
-        mDeviceUUID = UUID.fromString(b.getString(MainActivity.DEVICE_UUID));
-        mMaxChars = b.getInt(MainActivity.BUFFER_SIZE);
+        mDevice = b.getParcelable(Controlling.DEVICE_EXTRA);
+        mDeviceUUID = UUID.fromString(b.getString(Controlling.DEVICE_UUID));
+        mMaxChars = b.getInt(Controlling.BUFFER_SIZE);
 
         Log.d(TAG, "Ready");
 
+
+        idNombre = (EditText)findViewById(R.id.editText);
 
         cbxDireccion = (Spinner)findViewById(R.id.idDireccion);
         cbxTiempo = (Spinner)findViewById(R.id.idSegundos);
 
         btnGuardar = (Button)findViewById(R.id.btnSave);
+        bntMovimiento = (Button)findViewById(R.id.bntGuardarMov);
+
 
         movRuta = (ListView)findViewById(R.id.listView);
 
         ArrayList<String> direcciones = new ArrayList<>();
         ArrayList<String> tiempo = new ArrayList<>();
 
+        direcciones.add(" ");
         direcciones.add("Adelante");
         direcciones.add("Izquierda");
         direcciones.add("Derecha");
         direcciones.add("Atras");
 
-        tiempo.add("1");
-        tiempo.add("2");
-        tiempo.add("3");
-        tiempo.add("4");
-        tiempo.add("5");
-        tiempo.add("6");
-        tiempo.add("7");
-        tiempo.add("8");
-        tiempo.add("9");
+
+        tiempo.add("1 Seg");
+        tiempo.add("2 Seg");
+        tiempo.add("3 Seg");
+        tiempo.add("4 Seg");
+        tiempo.add("5 Seg");
+        tiempo.add("6 Seg");
+        tiempo.add("7 Seg");
+        tiempo.add("8 Seg");
+        tiempo.add("9 Seg");
 
         ArrayAdapter adprM = new ArrayAdapter(GuardarRuta.this, android.R.layout.simple_spinner_dropdown_item, direcciones);
         ArrayAdapter adprT = new ArrayAdapter(GuardarRuta.this, android.R.layout.simple_dropdown_item_1line, tiempo);
@@ -93,40 +113,100 @@ public class GuardarRuta extends Activity {
 
 
 
-        cbxDireccion.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        cbxDireccion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String elemento = (String) cbxDireccion.getAdapter().getItem(position);
-                switch(elemento){
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id){
+                String eleccion = (String) cbxDireccion.getAdapter().getItem(position);
+                switch(eleccion){
                     case "Izquierda":
-                        movimientoo = "6";
+                        movimientoo = "I";
                         break;
                     case "Derecha":
-                        movimientoo = "9";
-                        break;
-                    case "Adelante":
-                        movimientoo = "7";
+                        movimientoo = "D";
                         break;
                     case "Atras":
-                        movimientoo = "5";
+                        movimientoo = "A";
+                        break;
+                    case "Adelante":
+                        movimientoo = "T";
                         break;
                 }
 
             }
-        });
 
-
-        cbxTiempo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String elemento = (String) cbxDireccion.getAdapter().getItem(position);
-                tiempoo = elemento;
+            public void onNothingSelected(AdapterView<?> parent){
 
             }
         });
 
-        movimientos.add(new MovimientosRuta(movimientoo, tiempoo));
+        //String elemento = (String) cbxDireccion.getAdapter().getItem(position);
+        //tiempoo = elemento.toCharArray();
+        cbxTiempo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String elemento = (String) cbxTiempo.getAdapter().getItem(position);
+                switch(elemento){
+                    case "1 Seg":
+                        tiempoo = "1";
+                        break;
+                    case "2 Seg":
+                        tiempoo = "2";
+                        break;
+                    case "3 Seg":
+                        tiempoo = "3";
+                        break;
+                    case "4 Seg":
+                        tiempoo = "4";
+                        break;
+                    case "5 Seg":
+                        tiempoo = "5";
+                        break;
+                    case "6 Seg":
+                        tiempoo = "6";
+                        break;
+                    case "7 Seg":
+                        tiempoo = "7";
+                        break;
+                    case "8 Seg":
+                        tiempoo = "8";
+                        break;
+                    case "9 Seg":
+                        tiempoo = "9";
+                        break;
+                }
 
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+       // movimientos.add(new MovimientosRuta(movimientoo, tiempoo));
+
+
+        //Alamacenar el movimiento
+        bntMovimiento.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View v) {
+// TODO Auto-generated method stub
+                contadorMovimientos++;
+                if(contadorMovimientos < 3){
+                    cadena += movimientoo+":"+tiempoo+";";
+                    msg("Llevas menos de 3 movimientos");
+                    msg(movimientoo);
+                }else if(contadorMovimientos >= 9){
+                    msg("Ya tienes 8 movimientos, ya no necesitas mas");
+
+                }else if(contadorMovimientos <= 9 && contadorMovimientos >= 3){
+                    cadena += movimientoo+":"+tiempoo+";";
+                }
+
+            }});
 
         btnGuardar.setOnClickListener(new View.OnClickListener()
         {
@@ -134,14 +214,27 @@ public class GuardarRuta extends Activity {
             @Override
             public void onClick(View v) {
 // TODO Auto-generated method stub
-                String nombre = "";
-                guardarRuta.add(new Ruta(nombre, movimientos));
-                movimientos = new ArrayList<>();
+                try{
+                    if(contadorMovimientos < 3){
+                        msg("No");
+                    }else {
+                        String name = idNombre.getText().toString();
+                        cadena += "/";
+                        cadena += "" + name + "+}";
+                        mBTSocket.getOutputStream().write(cadena.getBytes());
+                        contadorMovimientos = 0;
+                    }
+                }catch (IOException io){
 
+                }
+
+
+                //guardarRuta.add(new Ruta(nombre, movimientos));
+                //movimientos = new ArrayList<>();
+                cadena = "#;";
             }});
 
     }
-
 
     private class ReadInput implements Runnable {
 
@@ -247,7 +340,7 @@ public class GuardarRuta extends Activity {
     @Override
     protected void onPause() {
         if (mBTSocket != null && mIsBluetoothConnected) {
-            new GuardarRuta.DisConnectBT().execute();
+            new DisConnectBT().execute();
         }
         Log.d(TAG, "Paused");
         super.onPause();
@@ -256,7 +349,7 @@ public class GuardarRuta extends Activity {
     @Override
     protected void onResume() {
         if (mBTSocket == null || !mIsBluetoothConnected) {
-            new GuardarRuta.ConnectBT().execute();
+            new ConnectBT().execute();
         }
         Log.d(TAG, "Resumed");
         super.onResume();
@@ -280,7 +373,7 @@ public class GuardarRuta extends Activity {
         @Override
         protected void onPreExecute() {
 
-            //progressDialog = ProgressDialog.show(Controlling.this, "Hold on", "Connecting");// http://stackoverflow.com/a/11130220/1287554
+            progressDialog = ProgressDialog.show(GuardarRuta.this, "Hold on", "Connecting");// http://stackoverflow.com/a/11130220/1287554
 
         }
 
@@ -314,10 +407,10 @@ public class GuardarRuta extends Activity {
             } else {
                 msg("Connected to device");
                 mIsBluetoothConnected = true;
-                mReadThread = new GuardarRuta.ReadInput(); // Kick off input reader
+                mReadThread = new ReadInput(); // Kick off input reader
             }
 
-            //progressDialog.dismiss();
+            progressDialog.dismiss();
         }
 
     }
@@ -326,7 +419,6 @@ public class GuardarRuta extends Activity {
         // TODO Auto-generated method stub
         super.onDestroy();
     }
-
 
 
 }

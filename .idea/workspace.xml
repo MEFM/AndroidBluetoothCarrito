@@ -127,8 +127,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/com/example/apppractica3/GuardarRuta.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="142">
-                  <caret line="204" column="75" selection-start-line="204" selection-start-column="75" selection-end-line="204" selection-end-column="75" />
+                <state relative-caret-position="2361">
+                  <caret line="225" column="14" selection-start-line="225" selection-start-column="14" selection-end-line="225" selection-end-column="14" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="e#1648#1665#0" expanded="true" />
@@ -331,7 +331,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Captures" order="0" side_tool="true" weight="0.25" />
       <window_info content_ui="combo" id="Project" order="1" weight="0.11610738" />
@@ -346,7 +345,7 @@
       <window_info anchor="bottom" id="Logcat" order="1" weight="0.3286119" />
       <window_info anchor="bottom" id="TODO" order="2" weight="0.3286119" />
       <window_info anchor="bottom" id="Find" order="3" weight="0.3286119" />
-      <window_info anchor="bottom" id="Terminal" order="4" weight="0.3286119" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="4" visible="true" weight="0.09773371" />
       <window_info anchor="bottom" id="Event Log" order="5" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="6" weight="0.3286119" />
       <window_info anchor="bottom" id="Build" order="7" weight="0.3286119" />
@@ -512,8 +511,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/example/apppractica3/GuardarRuta.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="142">
-          <caret line="204" column="75" selection-start-line="204" selection-start-column="75" selection-end-line="204" selection-end-column="75" />
+        <state relative-caret-position="2361">
+          <caret line="225" column="14" selection-start-line="225" selection-start-column="14" selection-end-line="225" selection-end-column="14" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1648#1665#0" expanded="true" />
